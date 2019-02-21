@@ -10,7 +10,7 @@ import torch.nn.functional as F
 import time
 import math
 
-def train(input_tensor, target_tensor, encoder, decoder, criterion, optimizer, max_length=MAX_LENGTH):
+def train(input_tensor, target_tensor, encoder, decoder, criterion, optimizer):
     encoder_hidden = encoder.initHidden()
 
     optimizer.zero_grad()
