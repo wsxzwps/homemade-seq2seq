@@ -12,8 +12,8 @@ import math
 
 import tqdm
 
-def train(input_tensor, target_tensor, encoder, decoder, criterion, optimizer):
-    encoder_hidden = encoder.initHidden()
+def train(input_tensor, target_tensor, encoder, decoder, criterion, optimizer, device):
+    encoder_hidden = encoder.initHidden(device)
 
     optimizer.zero_grad()
 
@@ -54,7 +54,7 @@ def timeSince(since, percent):
     rs = es - s
     return '%s (- %s)' % (asMinutes(s), asMinutes(rs))
 
-def trainIters(loader, encoder, decoder, n_iters, print_every=1000, plot_every=100, learning_rate=0.01):
+def trainIters(loader, encoder, decoder, n_iters, device, print_every=1000, plot_every=100, learning_rate=0.01):
     start = time.time()
     plot_losses = []
     print_loss_total = 0  # Reset every print_every
@@ -74,7 +74,7 @@ def trainIters(loader, encoder, decoder, n_iters, print_every=1000, plot_every=1
         inputs = makeInp(next(ld))
         input_tensor = inputs['question']
         target_tensor = inputs['response']
-        loss = train(input_tensor, target_tensor, encoder, decoder, criterion, optimizer)
+        loss = train(input_tensor, target_tensor, encoder, decoder, criterion, optimizer, device)
         print_loss_total += loss
         plot_loss_total += loss
 
@@ -101,7 +101,7 @@ def main():
     encoder = EncoderRNN(vocab_size, hidden_size, hidden_size, embedding).to(device)
     decoder = DecoderRNN(vocab_size, hidden_size, hidden_size, embedding).to(device)
 
-    trainIters(loader, encoder, decoder, 10000, print_every=1000)
+    trainIters(loader, encoder, decoder, 10000, device, print_every=1000)
 
 if __name__ == "__main__":
     main()
