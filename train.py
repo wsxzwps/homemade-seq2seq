@@ -10,6 +10,8 @@ import torch.nn.functional as F
 import time
 import math
 
+import tqdm
+
 def train(input_tensor, target_tensor, encoder, decoder, criterion, optimizer):
     encoder_hidden = encoder.initHidden()
 
