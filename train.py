@@ -88,12 +88,12 @@ def main():
     
     loader = LoaderHandler(config)
 
-    embedding_path = 'word2vec.npy'
+    embedding_path = config['model']['embedding']
     embedding = torch.FloatTensor(np.load(embedding_path))
     vocab_size = len(embedding)
 
 
-    hidden_size = config['model'].hidden_size
+    hidden_size = config['model']['hidden_size']
     encoder = EncoderRNN(vocab_size, hidden_size, hidden_size, embedding).to(device)
     decoder = DecoderRNN(vocab_size, hidden_size, hidden_size, embedding).to(device)
 
