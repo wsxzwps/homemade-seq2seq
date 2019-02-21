@@ -64,11 +64,11 @@ def trainIters(loader, encoder, decoder, n_iters, print_every=1000, plot_every=1
 
     ld = iter(loader.ldTrain)
 
-	numIters = len(ld)
+    numIters = len(ld)
     qdar = tqdm.tqdm(range(numIters),
                             total= numIters,
                             ascii=True)
-	for itr in qdar: 
+    for itr in qdar: 
         inputs = makeInp(next(ld))
         input_tensor = inputs['question']
         target_tensor = inputs['response']

@@ -62,7 +62,7 @@ class CustomDataset(Dataset):
 				indArr.append(self.unk_id)
 		indArr.append(self.eos_id) 
 		indArr = np.array(indArr)
-return indArr
+		return indArr
 		
 def seq_collate(batch):
 	# print('>>>>>>>batch: '+str(batch))

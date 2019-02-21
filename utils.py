@@ -43,4 +43,4 @@ class ConfigParser:
 		opt = ConfigParser._parse_command_line()
 		# parse config file, combine opt and config into config. 
 		config = ConfigParser._parse_config_file(opt)
-return config
+		return config
