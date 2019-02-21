@@ -6,13 +6,11 @@ import numpy as np
 class CustomDataset(Dataset):
 	"""docstring for Dataset"""
 	# dataset behave differently when requesting label or unlabel data
-	POS = 1
-	NEG = 0
-	def __init__(self, config, datafile, emotion_label_file, forceNoNoise=False): #, wordDictFile): #, labeled=True, needLabel=True):
+	def __init__(self, config, datafile, forceNoNoise=False): #, wordDictFile): #, labeled=True, needLabel=True):
 		super(CustomDataset, self).__init__()
 		print('- dataset: '+datafile)
-		# self.data = {self.POS:[], self.NEG:[]}
-		self.data = self.readData(datafile, emotion_label_file)
+
+		self.data = self.readData(datafile)
 
 		with open(config['wordDict'],"rb") as fp:
 			self.wordDict = pickle.load(fp,encoding='latin1')
@@ -26,28 +24,22 @@ class CustomDataset(Dataset):
 		# self.sm.mark(['i', 'had', 'the', 'baja', 'burro', '...', 'it', 'was', 'heaven'])
 		pass
 
-	def readData(self,datafile, emotion_label_file):
+	def readData(self,datafile):
 		question = []
 		response = []
-		labels_q = [] 
-		labels_r = []
+
 		# proc .0 file (negative)
 		with open(datafile, 'r') as f:
 			lines = f.readlines()
-		
-		with open(emotion_label_file, 'r') as f:
-			lines_labels = f.readlines()
 
 		for i in range(len(lines)):
 			sentences = lines[i].split('__eou__')[:-1] # there's one empty sentence in the end
-			labels = lines_labels[i].split(' ')
 		
 			for j in range(len(sentences)-1):
 				question.append(sentences[j].strip())
 				response.append(sentences[j+1].strip())
-				labels_q.append(labels[j])
-				labels_r.append(labels[j+1])
-		return question, response, labels_q, labels_r
+
+		return question, response
 
 	def __len__(self):
 		return len(self.data)
@@ -55,10 +47,8 @@ class CustomDataset(Dataset):
 	def __getitem__(self, idx):
 		question_idx = self.word2index(self.data[0][idx])
 		response_idx = self.word2index(self.data[1][idx])
-		labels_q = self.data[2][idx]
-		labels_r = self.data[3][idx]
-		return (question_idx,response_idx,labels_q,labels_r)
 
+		return (question_idx,response_idx)
 
 	def word2index(self, sentence, sos=False):
 		indArr = []
@@ -109,18 +99,12 @@ def seq_collate(batch):
 
 	question, qLengths = extract(0)
 	response, rLengths = extract(1) 
-	labels_q, lqLengths = extract(2)
-	labels_r, lrLengths = extract(3)
 
 	return {'question': question,
 			'qLengths': qLengths,
 			'response': response,
-			'rLengths': rLengths,
-			'labels_q': labels_q,
-			'lqLengths':lqLengths,
-			'labels_r': labels_r,
-			'lrLengths':lrLengths
-}
+			'rLengths': rLengths
+		}
 
 class LoaderHandler(object):
 	"""docstring for LoaderHandler"""
@@ -130,13 +114,13 @@ class LoaderHandler(object):
 		mode = config['opt'].mode
 		config = config['loader']
 		if mode == 'test':
-			testData = CustomDataset(config,config['testFile'],config['testLabel'],forceNoNoise=True)
+			testData = CustomDataset(config,config['testFile'],forceNoNoise=True)
 			self.ldTestEval = DataLoader(testData,batch_size=1, shuffle=False, collate_fn=seq_collate)
 			return
 		if mode == 'train':
-			trainData = CustomDataset(config,config['trainFile'],config['trainLabel'])
+			trainData = CustomDataset(config,config['trainFile'])
 			self.ldTrain = DataLoader(trainData,batch_size=config['batchSize'], shuffle=True, num_workers=2, collate_fn=seq_collate)
 		# elif mode == 'val':
-		devData = CustomDataset(config,config['devFile'],config['devLabel'],forceNoNoise=True)
+		devData = CustomDataset(config,config['devFile'],forceNoNoise=True)
 		self.ldDev = DataLoader(devData,batch_size=config['batchSize'], shuffle=False, num_workers=2, collate_fn=seq_collate)
-self.ldDevEval = DataLoader(devData,batch_size=1, shuffle=False, collate_fn=seq_collate)
+		self.ldDevEval = DataLoader(devData,batch_size=1, shuffle=False, collate_fn=seq_collate)
