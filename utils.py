@@ -43,4 +43,18 @@ class ConfigParser:
 		opt = ConfigParser._parse_command_line()
 		# parse config file, combine opt and config into config. 
 		config = ConfigParser._parse_config_file(opt)
-return config
+        return config
+
+def makeInp(inputs):
+	"""Move tensors onto GPU if available.
+
+	Args:
+		inputs: A dict with a batch of word-indexed data from DataLoader. Contains
+			['brk_sentence', 'bs_inp_lengths', 'style', 'sentence', 'st_inp_lengths', 'marker', 'mk_inp_lengths']
+	Returns:
+		inputs: The dict with same structure but stored on GPU.
+	"""
+	if torch.cuda.is_available():
+		for key in inputs:
+			inputs[key] = inputs[key].cuda()
+	return inputs

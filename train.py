@@ -93,7 +93,7 @@ def main():
     vocab_size = len(embedding)
 
 
-    hidden_size = 256
+    hidden_size = config['model'].hidden_size
     encoder = EncoderRNN(vocab_size, hidden_size, hidden_size, embedding).to(device)
     decoder = DecoderRNN(vocab_size, hidden_size, hidden_size, embedding).to(device)
 
