@@ -84,6 +84,8 @@ def trainIters(loader, encoder, decoder, n_iters, print_every=1000, plot_every=1
 
 
 def main():
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
     config = ConfigParser.parse_config()
     
     loader = LoaderHandler(config)
