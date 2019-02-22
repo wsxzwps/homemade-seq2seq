@@ -36,8 +36,8 @@ class CustomDataset(Dataset):
 			sentences = lines[i].split('__eou__')[:-1] # there's one empty sentence in the end
 		
 			for j in range(len(sentences)-1):
-				question.append(sentences[j].strip())
-				response.append(sentences[j+1].strip())
+				question.append(sentences[j].strip().split())
+				response.append(sentences[j+1].strip().split())
 
 		return question, response
 
