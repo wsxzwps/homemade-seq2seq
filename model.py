@@ -7,7 +7,6 @@ class EncoderRNN(nn.Module):
     def __init__(self, vocab_size, embedding_size, hidden_size, batch_size, embedding=None):
         super(EncoderRNN, self).__init__()
         self.hidden_size = hidden_size
-        self.embedding_size = embedding_size
         self.batch_size = batch_size
 
         self.embedding = nn.Embedding(vocab_size, embedding_size)
@@ -17,18 +16,17 @@ class EncoderRNN(nn.Module):
         self.gru = nn.GRU(embedding_size, hidden_size)
 
     def initHidden(self, device):
-        return torch.zeros(1, self.batch_size, self.hidden_size, device=device)
+        return torch.zeros(self.batch_size, 1, self.hidden_size, device=device)
     
     def forward(self, input, hidden):
-        embs = self.embedding(input).view(input.shape[1],self.batch_size,self.embedding_size)
-        output, hidden = self.gru(embs, hidden)
+        embs = self.embedding(input)
+        output, hidden = self.gru(embs, hidden, batch_first = True)
         return output, hidden
 
 class DecoderRNN(nn.Module):
     def __init__(self, vocab_size, embedding_size, hidden_size, batch_size, embedding=None):
         super(DecoderRNN, self).__init__()
         self.hidden_size = hidden_size
-        self.embedding_size = embedding_size
         self.batch_size = batch_size
 
         self.embedding = nn.Embedding(vocab_size, embedding_size)
@@ -41,9 +39,8 @@ class DecoderRNN(nn.Module):
         return torch.zeros(1, self.batch_size, self.hidden_size, device=device)
 
     def forward(self, input, hidden):
-        embs = self.embedding(input).view(input.shape[1],self.batch_size,self.embedding_size)
-        output, hidden = self.gru(embs, hidden)
-        output = output.view(len(input), -1)
+        embs = self.embedding(input)
+        output, hidden = self.gru(embs, hidden, batch_first = True)
         output = F.log_softmax(self.out(output), dim=1)
         return output, hidden
 
