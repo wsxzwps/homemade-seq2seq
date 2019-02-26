@@ -17,8 +17,8 @@ def train(input_tensor, target_tensor, encoder, decoder, criterion, optimizer, d
 
     optimizer.zero_grad()
 
-    input_length = input_tensor.size(0)
-    target_length = target_tensor.size(0)
+    input_length = input_tensor.size(1)
+    target_length = target_tensor.size(1)
 
     loss = 0
 
@@ -31,7 +31,7 @@ def train(input_tensor, target_tensor, encoder, decoder, criterion, optimizer, d
     # Get decoder hidden states and outputs
     output_d, hidden_d = decoder(target_tensor, hidden_e)
     # Define the loss function
-    loss = criterion(output_e, target_tensor)
+    loss = criterion(output_e[:,:target_length,:], target_tensor)
     
     #####################################
 
