@@ -28,6 +28,7 @@ class DecoderRNN(nn.Module):
     def __init__(self, vocab_size, embedding_size, hidden_size, batch_size, embedding=None):
         super(DecoderRNN, self).__init__()
         self.hidden_size = hidden_size
+        self.embedding_size = embedding_size
         self.batch_size = batch_size
 
         self.embedding = nn.Embedding(vocab_size, embedding_size)
