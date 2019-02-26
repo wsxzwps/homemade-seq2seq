@@ -16,7 +16,7 @@ class EncoderRNN(nn.Module):
         self.gru = nn.GRU(embedding_size, hidden_size, batch_first = True)
 
     def initHidden(self, device):
-        return torch.zeros(self.batch_size, 1, self.hidden_size, device=device)
+        return torch.zeros(1, self.batch_size, self.hidden_size, device=device)
     
     def forward(self, input, hidden):
         embs = self.embedding(input)
