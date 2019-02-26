@@ -18,7 +18,7 @@ class EncoderRNN(nn.Module):
         return torch.zeros(1, 1, self.hidden_size, device=device)
     
     def forward(self, input, hidden):
-        embs = self.embedding(input).view(len(input), 1, -1)
+        embs = self.embedding(input)
         output, hidden = self.gru(embs, hidden)
         return output, hidden
 
