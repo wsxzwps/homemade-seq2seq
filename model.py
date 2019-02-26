@@ -7,6 +7,7 @@ class EncoderRNN(nn.Module):
     def __init__(self, vocab_size, embedding_size, hidden_size, embedding=None):
         super(EncoderRNN, self).__init__()
         self.hidden_size = hidden_size
+        self.embedding_size = embedding_size
 
         self.embedding = nn.Embedding(vocab_size, embedding_size)
         if embedding is not None:
@@ -18,7 +19,7 @@ class EncoderRNN(nn.Module):
         return torch.zeros(1, 1, self.hidden_size, device=device)
     
     def forward(self, input, hidden):
-        embs = self.embedding(input)
+        embs = self.embedding(input).view(input.shape[1],input.shape[0],self.embedding_size)
         output, hidden = self.gru(embs, hidden)
         return output, hidden
 
