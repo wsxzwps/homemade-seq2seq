@@ -42,7 +42,7 @@ class CustomDataset(Dataset):
 		return question, response
 
 	def __len__(self):
-		return len(self.data)
+		return len(self.data[0])
 
 	def __getitem__(self, idx):
 		question_idx = self.word2index(self.data[0][idx])
