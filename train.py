@@ -98,7 +98,7 @@ def main():
 
 
     hidden_size = config['model']['hidden_size']
-    batch_size = config['loader']['batch_size']
+    batch_size = config['loader']['batchSize']
     encoder = EncoderRNN(vocab_size, 100, hidden_size, embedding).to(device)
     decoder = DecoderRNN(vocab_size, 100, hidden_size, embedding).to(device)
 
