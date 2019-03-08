@@ -52,22 +52,18 @@ def timeSince(since, percent):
 def trainIters(loader, encoder, decoder, max_epoch, device, learning_rate=0.01):
     start = time.time()
     plot_losses = []
-    print_loss_total = 0  # Reset every print_every
-    plot_loss_total = 0  # Reset every plot_every
 
     parameters = list(encoder.parameters()) + list(decoder.parameters())
     optimizer = optim.SGD(parameters, lr=learning_rate)
     criterion = nn.CrossEntropyLoss()
 
-    ld = iter(loader.ldTrain)
-
-    numIters = len(ld)
-    qdar = tqdm.tqdm(range(numIters),
-                            total= numIters,
-                            ascii=True)
-
-    # i = 0
     for epoch in range(max_epoch):
+        ld = iter(loader.ldTrain)
+
+        numIters = len(ld)
+        qdar = tqdm.tqdm(range(numIters),
+                                total= numIters,
+                                ascii=True)
         n = 0
         loss = 0
         for itr in qdar: 
