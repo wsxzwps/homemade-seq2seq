@@ -65,6 +65,8 @@ def trainIters(loader, encoder, decoder, n_iters, device, print_every=1000, plot
     qdar = tqdm.tqdm(range(numIters),
                             total= numIters,
                             ascii=True)
+
+    i = 0
     for itr in qdar: 
         inputs = makeInp(next(ld))
         input_tensor = inputs['question']
@@ -74,11 +76,12 @@ def trainIters(loader, encoder, decoder, n_iters, device, print_every=1000, plot
         print_loss_total += loss
         plot_loss_total += loss
 
-        if iter % print_every == 0:
+        if i % print_every == 0:
             print_loss_avg = print_loss_total / print_every
             print_loss_total = 0
             print('%s (%d %d%%) %.4f' % (timeSince(start, iter / n_iters),
                                          iter, iter / n_iters * 100, print_loss_avg))
+        i += 1
 
 
 def main():
