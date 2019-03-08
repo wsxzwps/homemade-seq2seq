@@ -49,6 +49,25 @@ def timeSince(since, percent):
     rs = es - s
     return '%s (- %s)' % (asMinutes(s), asMinutes(rs))
 
+def train(loader, encoder, decoder, criterion, optimizer, device):
+    ld = iter(loader)
+
+    numIters = len(ld)
+    qdar = tqdm.tqdm(range(numIters),
+                            total= numIters,
+                            ascii=True)
+    n = 0
+    loss = 0
+    for itr in qdar: 
+        inputs = makeInp(next(ld))
+        input_tensor = inputs['question']
+        target_tensor = inputs['response']
+        target_length = inputs['rLengths']
+        loss += train(input_tensor, target_tensor, target_length, encoder, decoder, criterion, optimizer, device)
+        n += 1
+    loss /= n
+    return loss
+
 def trainIters(loader, encoder, decoder, max_epoch, device, learning_rate=0.01):
     start = time.time()
     plot_losses = []
@@ -58,24 +77,11 @@ def trainIters(loader, encoder, decoder, max_epoch, device, learning_rate=0.01):
     criterion = nn.CrossEntropyLoss()
 
     for epoch in range(max_epoch):
-        ld = iter(loader.ldTrain)
-
-        numIters = len(ld)
-        qdar = tqdm.tqdm(range(numIters),
-                                total= numIters,
-                                ascii=True)
-        n = 0
-        loss = 0
-        for itr in qdar: 
-            inputs = makeInp(next(ld))
-            input_tensor = inputs['question']
-            target_tensor = inputs['response']
-            target_length = inputs['rLengths']
-            loss += train(input_tensor, target_tensor, target_length, encoder, decoder, criterion, optimizer, device)
-            n += 1
-        loss /= n
+        loss = train(loader.ldTrain, encoder, decoder, criterion, optimizer, device)
         print('Epoch '+str(epoch)+': perplexity on the train set: '+str(math.exp(loss)))
-
+        with torch.no_grad():
+            dev_loss = train(loader.ldDev, encoder, decoder,criterion, optimizer, device)
+            print('perplexity on the train set: '+str(math.exp(loss)))
 
 def main():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
