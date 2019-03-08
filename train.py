@@ -49,7 +49,7 @@ def timeSince(since, percent):
     rs = es - s
     return '%s (- %s)' % (asMinutes(s), asMinutes(rs))
 
-def trainIters(loader, encoder, decoder, n_iters, device, print_every=1000, plot_every=100, learning_rate=0.01):
+def trainIters(loader, encoder, decoder, max_epoch, learning_rate=0.01):
     start = time.time()
     plot_losses = []
     print_loss_total = 0  # Reset every print_every
@@ -66,22 +66,19 @@ def trainIters(loader, encoder, decoder, n_iters, device, print_every=1000, plot
                             total= numIters,
                             ascii=True)
 
-    i = 0
-    for itr in qdar: 
-        inputs = makeInp(next(ld))
-        input_tensor = inputs['question']
-        target_tensor = inputs['response']
-        target_length = inputs['rLengths']
-        loss = train(input_tensor, target_tensor, target_length, encoder, decoder, criterion, optimizer, device)
-        print_loss_total += loss
-        plot_loss_total += loss
+    # i = 0
+    for epoch in range(max_epoch):
+        n = 0
+        loss = 0
+        for itr in qdar: 
+            inputs = makeInp(next(ld))
+            input_tensor = inputs['question']
+            target_tensor = inputs['response']
+            target_length = inputs['rLengths']
+            loss += train(input_tensor, target_tensor, target_length, encoder, decoder, criterion, optimizer, device)
+            n += 1
 
-        # if i % print_every == 0:
-        #     print_loss_avg = print_loss_total / print_every
-        #     print_loss_total = 0
-        #     print('%s (%d %d%%) %.4f' % (timeSince(start, i / n_iters),
-        #                                  i, i / n_iters * 100, print_loss_avg))
-        # i += 1
+        print('Epoch '+str(epoch)+: 'perplexity on train set: '+str(math.exp(loss)))
 
 
 def main():
@@ -101,7 +98,7 @@ def main():
     encoder = EncoderRNN(vocab_size, 100, hidden_size, batch_size, embedding).to(device)
     decoder = DecoderRNN(vocab_size, 100, hidden_size, batch_size, embedding).to(device)
 
-    trainIters(loader, encoder, decoder, 1000, device, print_every=100)
+    trainIters(loader, encoder, decoder, 100, learning_rate=0.01)
 
 if __name__ == "__main__":
     main()
