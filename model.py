@@ -54,7 +54,7 @@ class DecoderRNN(nn.Module):
                 embs = self.embedding(words)
                 output, hidden = self.gru(embs, hidden)
                 scores = F.log_softmax(self.out(output), dim=1)
-                out[:,i,:] = torch.unsqueeze(scores,1)
+                out[:,i,:] = torch.squeeze(scores,1)
                 for j in range(input.shape[0]):
                     words[j] = torch.argmax(scores[j])
 
