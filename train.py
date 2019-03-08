@@ -77,7 +77,7 @@ def trainIters(loader, encoder, decoder, max_epoch, device, learning_rate=0.01):
             target_length = inputs['rLengths']
             loss += train(input_tensor, target_tensor, target_length, encoder, decoder, criterion, optimizer, device)
             n += 1
-
+        loss /= n
         print('Epoch '+str(epoch)+': perplexity on the train set: '+str(math.exp(loss)))
 
 
