@@ -38,14 +38,14 @@ class DecoderRNN(nn.Module):
         self.out = nn.Linear(hidden_size, vocab_size)
 
 
-    def forward(self, input, hidden, maxlen, teacher_forcing_ratio=1):
+    def forward(self, input, hidden, max_len, teacher_forcing_ratio=1):
         if random.random() < teacher_forcing_ratio:
             embs = self.embedding(input)
             output, hidden = self.gru(embs, hidden)
             output = F.log_softmax(self.out(output), dim=1)
         else:
             words = torch.zeros([input.shape[0],1]) + self.sos_id
-            out = torch.zeros(input.shape[0], maxlen,self.embedding_size)
+            out = torch.zeros(input.shape[0], max_len,self.embedding_size)
             for i in range(max_len):
                 embs = self.embedding(words)
                 output, hidden = self.gru(embs, hidden)
