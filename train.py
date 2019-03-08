@@ -31,7 +31,7 @@ def train(input_tensor, target_tensor, target_lengths, encoder, decoder, criteri
     loss /= batch_size
     #####################################
 
-    if need_grad():
+    if need_grad:
         loss.backward()
 
         optimizer.step()
