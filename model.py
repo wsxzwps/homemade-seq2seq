@@ -48,9 +48,11 @@ class DecoderRNN(nn.Module):
             words = [self.sos_id] * input.shape[0]
             words = torch.LongTensor(words).view(input.shape[0],-1)
             out = torch.zeros(input.shape[0], max_len,self.vocab_size)
-            for i in range(max_len):
-                if torch.cuda.is_available():
-                    words = words.cuda()
+            if torch.cuda.is_available():
+                out = out.cuda()
+                words = words.cuda()
+                
+            for i in range(max_len):                
                 embs = self.embedding(words)
                 output, hidden = self.gru(embs, hidden)
                 scores = F.log_softmax(self.out(output), dim=1)
