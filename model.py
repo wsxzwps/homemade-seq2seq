@@ -58,7 +58,7 @@ class DecoderRNN(nn.Module):
                 if out is None:
                     out = scores
                 else:
-                    out = torch.cat((out, output), 1)
+                    out = torch.cat((out, scores), 1)
                 for j in range(input.shape[0]):
                     words[j] = torch.argmax(scores[j])
 
