@@ -26,7 +26,7 @@ def train(input_tensor, target_tensor, encoder, decoder, criterion, optimizer, d
 
     output_d, hidden_d = decoder(target_tensor[:,:-1], hidden_e)
     # Define the loss function
-    loss = criterion(output_e, target_tensor[:,1:])
+    loss = criterion(output_d, target_tensor[:,1:])
     
     #####################################
 
