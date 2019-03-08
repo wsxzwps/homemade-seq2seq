@@ -15,12 +15,10 @@ class EncoderRNN(nn.Module):
 
         self.gru = nn.GRU(embedding_size, hidden_size, batch_first = True)
 
-    def initHidden(self, device):
-        return torch.zeros(1, self.batch_size, self.hidden_size, device=device)
     
-    def forward(self, input, hidden):
+    def forward(self, input):
         embs = self.embedding(input)
-        output, hidden = self.gru(embs, hidden)
+        output, hidden = self.gru(embs)
         return output, hidden
 
 class DecoderRNN(nn.Module):
@@ -32,11 +30,9 @@ class DecoderRNN(nn.Module):
         self.embedding = nn.Embedding(vocab_size, embedding_size)
         if embedding is not None:
             self.embedding.weight = nn.Parameter(embedding)
-        self.gru = nn.GRU(embedding_size, hidden_size,batch_first = True)
+        self.gru = nn.GRU(embedding_size, hidden_size, batch_first = True)
         self.out = nn.Linear(hidden_size, vocab_size)
 
-    def initHidden(self, device):
-        return torch.zeros(1, self.batch_size, self.hidden_size, device=device)
 
     def forward(self, input, hidden):
         embs = self.embedding(input)
