@@ -78,7 +78,7 @@ def trainIters(loader, encoder, decoder, max_epoch, learning_rate=0.01):
             loss += train(input_tensor, target_tensor, target_length, encoder, decoder, criterion, optimizer, device)
             n += 1
 
-        print('Epoch '+str(epoch)+: 'perplexity on train set: '+str(math.exp(loss)))
+        print('Epoch '+str(epoch)+': perplexity on the train set: '+str(math.exp(loss)))
 
 
 def main():
