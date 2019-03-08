@@ -12,12 +12,9 @@ import math
 
 import tqdm
 
-def train(input_tensor, target_tensor, encoder, decoder, criterion, optimizer, device):
+def train(input_tensor, target_tensor, target_lengths, encoder, decoder, criterion, optimizer, device):
 
     optimizer.zero_grad()
-
-    input_length = input_tensor.size(1)
-    target_length = target_tensor.size(1)
 
     loss = 0
 
@@ -26,15 +23,18 @@ def train(input_tensor, target_tensor, encoder, decoder, criterion, optimizer, d
 
     output_d, hidden_d = decoder(target_tensor[:,:-1], hidden_e)
     # Define the loss function
-    loss = criterion(output_d, target_tensor[:,1:])
+    batch_size = output_d.shape[0]
+    for i in range(batch_size):
+        loss += criterion(output_d[i,:target_lengths[i]-1,], target_tensor[:,1:target_lengths[i]])
     
+    loss /= batch_size
     #####################################
 
     loss.backward()
 
     optimizer.step()
 
-    return loss.item() / target_length
+    return loss.item()
 
 def asMinutes(s):
     m = math.floor(s / 60)
@@ -69,7 +69,8 @@ def trainIters(loader, encoder, decoder, n_iters, device, print_every=1000, plot
         inputs = makeInp(next(ld))
         input_tensor = inputs['question']
         target_tensor = inputs['response']
-        loss = train(input_tensor, target_tensor, encoder, decoder, criterion, optimizer, device)
+        target_length = inputs['rLengths']
+        loss = train(input_tensor, target_tensor, target_length, encoder, decoder, criterion, optimizer, device)
         print_loss_total += loss
         plot_loss_total += loss
 
