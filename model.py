@@ -45,6 +45,7 @@ class DecoderRNN(nn.Module):
             output = F.log_softmax(self.out(output), dim=1)
         else:
             words = torch.zeros([input.shape[0],1]) + self.sos_id
+            words = torch.LongTensor(words)
             out = torch.zeros(input.shape[0], max_len,self.embedding_size)
             for i in range(max_len):
                 embs = self.embedding(words)
