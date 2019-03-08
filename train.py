@@ -25,7 +25,7 @@ def train(input_tensor, target_tensor, target_lengths, encoder, decoder, criteri
     # Define the loss function
     batch_size = output_d.shape[0]
     for i in range(batch_size):
-        loss += criterion(output_d[i,:target_lengths[i]-1,], target_tensor[:,1:target_lengths[i]])
+        loss += criterion(output_d[i,:target_lengths[i]-1,:], target_tensor[i,1:target_lengths[i]])
     
     loss /= batch_size
     #####################################
