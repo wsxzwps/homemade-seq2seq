@@ -58,5 +58,5 @@ class DecoderRNN(nn.Module):
                 for j in range(input.shape[0]):
                     words[j] = torch.argmax(scores[j])
 
-        return output, hidden
+        return out, hidden
 
