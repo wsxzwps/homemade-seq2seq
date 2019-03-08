@@ -16,8 +16,8 @@ def train(input_tensor, target_tensor, encoder, decoder, criterion, optimizer, d
 
     optimizer.zero_grad()
 
-    input_length = input_tensor.size(0)
-    target_length = target_tensor.size(0)
+    input_length = input_tensor.size(1)
+    target_length = target_tensor.size(1)
 
     loss = 0
 
@@ -93,8 +93,9 @@ def main():
 
 
     hidden_size = config['model']['hidden_size']
-    encoder = EncoderRNN(vocab_size, 100, hidden_size, embedding).to(device)
-    decoder = DecoderRNN(vocab_size, 100, hidden_size, embedding).to(device)
+    batch_size = config['loader']['batchSize']
+    encoder = EncoderRNN(vocab_size, 100, hidden_size, batch_size, embedding).to(device)
+    decoder = DecoderRNN(vocab_size, 100, hidden_size, batch_size, embedding).to(device)
 
     trainIters(loader, encoder, decoder, 1000, device, print_every=100)
 
