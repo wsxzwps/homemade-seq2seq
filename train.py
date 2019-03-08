@@ -49,7 +49,7 @@ def timeSince(since, percent):
     rs = es - s
     return '%s (- %s)' % (asMinutes(s), asMinutes(rs))
 
-def trainIters(loader, encoder, decoder, max_epoch, learning_rate=0.01):
+def trainIters(loader, encoder, decoder, max_epoch, device, learning_rate=0.01):
     start = time.time()
     plot_losses = []
     print_loss_total = 0  # Reset every print_every
@@ -98,7 +98,7 @@ def main():
     encoder = EncoderRNN(vocab_size, 100, hidden_size, batch_size, embedding).to(device)
     decoder = DecoderRNN(vocab_size, 100, hidden_size, batch_size, embedding).to(device)
 
-    trainIters(loader, encoder, decoder, 100, learning_rate=0.01)
+    trainIters(loader, encoder, decoder, 100, device, learning_rate=0.01)
 
 if __name__ == "__main__":
     main()
