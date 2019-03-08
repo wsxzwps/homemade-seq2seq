@@ -82,21 +82,6 @@ def seq_collate(batch):
 		# inds = np.argsort(lengths)[::-1]
 		return torch.LongTensor(packed), torch.tensor(lengths)
 
-	def extract_marker_lengths(ind):
-		lengths = []
-		maxlen = 0
-		for seq in batch:
-			numMk = len(seq[ind])
-			maxlen = max([maxlen,numMk])
-		lengths = np.zeros([batchSize,maxlen])
-		k = 0
-		for seq in batch:
-			numMk = len(seq[ind])
-			tmp = [len(seq[ind][i]) for i in range(numMk)]
-			lengths[k,:numMk] = np.array(tmp)
-			k += 1
-		return torch.tensor(lengths)
-
 	question, qLengths = extract(0)
 	response, rLengths = extract(1) 
 

@@ -13,7 +13,6 @@ import math
 import tqdm
 
 def train(input_tensor, target_tensor, encoder, decoder, criterion, optimizer, device):
-    encoder_hidden = encoder.initHidden(device)
 
     optimizer.zero_grad()
 
@@ -23,15 +22,11 @@ def train(input_tensor, target_tensor, encoder, decoder, criterion, optimizer, d
     loss = 0
 
     # Get encoder hidden states and outputs
-    output_e, hidden_e = encoder(input_tensor, encoder_hidden)
-    
-    # Initialize decoder hidden state
+    output_e, hidden_e = encoder(input_tensor)
 
-    
-    # Get decoder hidden states and outputs
-    output_d, hidden_d = decoder(target_tensor, hidden_e)
+    output_d, hidden_d = decoder(target_tensor[:,:-1,:], hidden_e)
     # Define the loss function
-    loss = criterion(output_e, target_tensor)
+    loss = criterion(output_e, target_tensor[:,1:,:])
     
     #####################################
 
@@ -62,7 +57,7 @@ def trainIters(loader, encoder, decoder, n_iters, device, print_every=1000, plot
 
     parameters = list(encoder.parameters()) + list(decoder.parameters())
     optimizer = optim.SGD(parameters, lr=learning_rate)
-    criterion = nn.NLLLoss()
+    criterion = nn.CrossEntropyLoss()
 
     ld = iter(loader.ldTrain)
 
@@ -101,7 +96,7 @@ def main():
     encoder = EncoderRNN(vocab_size, 100, hidden_size, embedding).to(device)
     decoder = DecoderRNN(vocab_size, 100, hidden_size, embedding).to(device)
 
-    trainIters(loader, encoder, decoder, 10000, device, print_every=1000)
+    trainIters(loader, encoder, decoder, 1000, device, print_every=100)
 
 if __name__ == "__main__":
     main()
