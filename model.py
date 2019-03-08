@@ -39,7 +39,7 @@ class DecoderRNN(nn.Module):
 
 
     def forward(self, input, hidden, maxlen, teacher_forcing_ratio=1):
-        if random.random() < teacher_forcing_ratio
+        if random.random() < teacher_forcing_ratio:
             embs = self.embedding(input)
             output, hidden = self.gru(embs, hidden)
             output = F.log_softmax(self.out(output), dim=1)
