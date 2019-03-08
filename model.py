@@ -42,14 +42,13 @@ class DecoderRNN(nn.Module):
     def forward(self, input, hidden, max_len, teacher_forcing_ratio=1):
         if random.random() < teacher_forcing_ratio:
             embs = self.embedding(input)
-            output, hidden = self.gru(embs, hidden)
-            output = F.log_softmax(self.out(output), dim=1)
+            out, hidden = self.gru(embs, hidden)
+            out = F.log_softmax(self.out(out), dim=1)
         else:
             words = [self.sos_id] * input.shape[0]
             words = torch.LongTensor(words).view(input.shape[0],-1)
             out = None
             if torch.cuda.is_available():
-                out = out.cuda()
                 words = words.cuda()
 
             for i in range(max_len):                
@@ -62,6 +61,9 @@ class DecoderRNN(nn.Module):
                     out = torch.concat((out, output), 1)
                 for j in range(input.shape[0]):
                     words[j] = torch.argmax(scores[j])
+
+            if torch.cuda.is_available():
+                out = out.cuda()
 
         return out, hidden
 
