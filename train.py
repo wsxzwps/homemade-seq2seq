@@ -49,7 +49,7 @@ def timeSince(since, percent):
     rs = es - s
     return '%s (- %s)' % (asMinutes(s), asMinutes(rs))
 
-def train(loader, encoder, decoder, criterion, optimizer, device):
+def train_per_epoch(loader, encoder, decoder, criterion, optimizer, device):
     ld = iter(loader)
 
     numIters = len(ld)
@@ -77,10 +77,10 @@ def trainIters(loader, encoder, decoder, max_epoch, device, learning_rate=0.01):
     criterion = nn.CrossEntropyLoss()
 
     for epoch in range(max_epoch):
-        loss = train(loader.ldTrain, encoder, decoder, criterion, optimizer, device)
+        loss = train_per_epoch(loader.ldTrain, encoder, decoder, criterion, optimizer, device)
         print('Epoch '+str(epoch)+': perplexity on the train set: '+str(math.exp(loss)))
         with torch.no_grad():
-            dev_loss = train(loader.ldDev, encoder, decoder,criterion, optimizer, device)
+            dev_loss = train_per_epoch(loader.ldDev, encoder, decoder,criterion, optimizer, device)
             print('perplexity on the train set: '+str(math.exp(loss)))
 
 def main():
