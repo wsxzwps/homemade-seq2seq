@@ -12,9 +12,10 @@ import math
 
 import tqdm
 
-def train(input_tensor, target_tensor, target_lengths, encoder, decoder, criterion, optimizer, device):
+def train(input_tensor, target_tensor, target_lengths, encoder, decoder, criterion, optimizer, device, need_grad=True):
 
-    optimizer.zero_grad()
+    if need_grad:
+        optimizer.zero_grad()
 
     loss = 0
 
@@ -30,9 +31,10 @@ def train(input_tensor, target_tensor, target_lengths, encoder, decoder, criteri
     loss /= batch_size
     #####################################
 
-    loss.backward()
+    if need_grad():
+        loss.backward()
 
-    optimizer.step()
+        optimizer.step()
 
     return loss.item()
 
@@ -49,7 +51,7 @@ def timeSince(since, percent):
     rs = es - s
     return '%s (- %s)' % (asMinutes(s), asMinutes(rs))
 
-def train_per_epoch(loader, encoder, decoder, criterion, optimizer, device):
+def train_per_epoch(loader, encoder, decoder, criterion, optimizer, device, need_grad=True):
     ld = iter(loader)
 
     numIters = len(ld)
@@ -63,7 +65,7 @@ def train_per_epoch(loader, encoder, decoder, criterion, optimizer, device):
         input_tensor = inputs['question']
         target_tensor = inputs['response']
         target_length = inputs['rLengths']
-        loss += train(input_tensor, target_tensor, target_length, encoder, decoder, criterion, optimizer, device)
+        loss += train(input_tensor, target_tensor, target_length, encoder, decoder, criterion, optimizer, device, need_grad=need_grad)
         n += 1
     loss /= n
     return loss
