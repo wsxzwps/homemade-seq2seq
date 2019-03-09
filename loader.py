@@ -51,6 +51,7 @@ class CustomDataset(Dataset):
 		return (question_idx,response_idx)
 
 	def word2index(self, sentence):
+		indArr = []
 		indArr.append(self.sos_id)
 		for i in range(len(sentence)):
 			word = sentence[i]
