@@ -57,8 +57,8 @@ class DecoderRNN(nn.Module):
                 output, hidden = self.gru(embs, hidden)
                 scores = F.log_softmax(self.out(output), dim=2)
                 
-                for j in range(out.shape[1]):
-                    out[:,i,:] = scores.squeeze(1)
+
+                out[:,i,:] = scores.squeeze(1)
 
                 words = torch.topk(scores, 1)[1].squeeze(1)
 
