@@ -47,7 +47,7 @@ class DecoderRNN(nn.Module):
         else:
             words = [self.sos_id] * input.shape[0]
             words = torch.LongTensor(words).view(input.shape[0],-1)
-            out = torch.zeros(input.shape[0],maxlen,self.vocab_size)
+            out = torch.zeros(input.shape[0],max_len,self.vocab_size)
             if torch.cuda.is_available():
                 words = words.cuda()
 
