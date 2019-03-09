@@ -51,6 +51,7 @@ class DecoderRNN(nn.Module):
             out = torch.zeros(input.shape[0],max_len,self.vocab_size)
             if torch.cuda.is_available():
                 words = words.cuda()
+                out = out.cuda()
 
             for i in range(max_len):                
                 embs = self.embedding(words)
@@ -63,8 +64,7 @@ class DecoderRNN(nn.Module):
                 words = torch.topk(scores, 1)[1].squeeze(1)
 
 
-            if torch.cuda.is_available():
-                out = out.cuda()
+            
 
         return out, hidden
 
