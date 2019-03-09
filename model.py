@@ -54,7 +54,7 @@ class DecoderRNN(nn.Module):
             for i in range(max_len):                
                 embs = self.embedding(words)
                 output, hidden = self.gru(embs, hidden)
-                scores = F.log_softmax(self.out(output), dim=2)
+                scores = F.log_softmax(self.out(output), dim=1)
                 if out is None:
                     out = scores
                 else:
