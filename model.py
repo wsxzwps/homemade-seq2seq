@@ -54,12 +54,12 @@ class DecoderRNN(nn.Module):
             for i in range(max_len):                
                 embs = self.embedding(words)
                 output, hidden = self.gru(embs, hidden)
-                scores = F.log_softmax(self.out(output), dim=1)
+                scores = F.log_softmax(self.out(output), dim=2)
                 if out is None:
                     out = scores
                 else:
                     out = torch.cat((out, scores), 1)
-                    words[j] = torch.topk(scores, 1)
+                    words[j] = torch.topk(scores, 1)[1]
 
             if torch.cuda.is_available():
                 out = out.cuda()
