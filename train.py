@@ -22,7 +22,7 @@ def train(input_tensor, target_tensor, target_lengths, encoder, decoder, criteri
     # Get encoder hidden states and outputs
     output_e, hidden_e = encoder(input_tensor)
 
-    output_d, hidden_d = decoder(target_tensor[:,:-1], hidden_e, 40, teacher_forcing_ratio = teacher_forcing_ratio)
+    output_d, hidden_d = decoder(target_tensor[:,:-1], hidden_e, 90, teacher_forcing_ratio = teacher_forcing_ratio)
     # Define the loss function
     batch_size = output_d.shape[0]
     for i in range(batch_size):
