@@ -1,7 +1,7 @@
 {
   "expPath": "./exp",
   "loader": {
-    "batchSize": 8,
+    "batchSize": 16,
     "isTrans": 0,
     "wordDict": "./AuxData/wordDict",
     "trainFile": "./Data/train",

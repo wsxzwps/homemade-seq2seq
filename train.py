@@ -79,7 +79,7 @@ def trainIters(loader, encoder, decoder, max_epoch, device, learning_rate=0.01):
     criterion = nn.CrossEntropyLoss()
 
     for epoch in range(max_epoch):
-        loss = train_per_epoch(loader.ldTrain, encoder, decoder, criterion, optimizer, device)
+        loss = train_per_epoch(loader.ldTrain, encoder, decoder, criterion, optimizer, device, teacher_forcing_ratio=0.5)
         print('Epoch '+str(epoch)+': perplexity on the train set: '+str(math.exp(loss)))
         with torch.no_grad():
             dev_loss = train_per_epoch(loader.ldDev, encoder, decoder,criterion, optimizer, device, need_grad=False)
