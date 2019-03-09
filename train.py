@@ -51,7 +51,7 @@ def timeSince(since, percent):
     rs = es - s
     return '%s (- %s)' % (asMinutes(s), asMinutes(rs))
 
-def train_per_epoch(loader, encoder, decoder, criterion, optimizer, device, need_grad=True):
+def train_per_epoch(loader, encoder, decoder, criterion, optimizer, device, need_grad=True, teacher_forcing_ratio=0):
     ld = iter(loader)
 
     numIters = len(ld)
@@ -65,7 +65,7 @@ def train_per_epoch(loader, encoder, decoder, criterion, optimizer, device, need
         input_tensor = inputs['question']
         target_tensor = inputs['response']
         target_length = inputs['rLengths']
-        loss += train(input_tensor, target_tensor, target_length, encoder, decoder, criterion, optimizer, device, need_grad=need_grad)
+        loss += train(input_tensor, target_tensor, target_length, encoder, decoder, criterion, optimizer, device, need_grad=need_grad, teacher_forcing_ratio=teacher_forcing_ratio)
         n += 1
     loss /= n
     return loss
