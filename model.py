@@ -59,8 +59,7 @@ class DecoderRNN(nn.Module):
                     out = scores
                 else:
                     out = torch.cat((out, scores), 1)
-                for j in range(input.shape[0]):
-                    words[j] = torch.argmax(scores[j])
+                    words[j] = torch.topk(scores, 1)
 
             if torch.cuda.is_available():
                 out = out.cuda()
