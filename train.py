@@ -135,6 +135,7 @@ def trainIters(loader, encoder, decoder, max_epoch, device, learning_rate=0.01):
             # if best_dev_loss is None or best_dev_loss > dev_loss:
             #     best_dev_loss = dev_loss
             #     torch.save(encoder.state_dict(), PATH)
+    evaluate(loader.ldTestEval, encoder, decoder)
     
 
 
