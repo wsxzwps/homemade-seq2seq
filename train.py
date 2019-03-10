@@ -83,7 +83,7 @@ def trainIters(loader, encoder, decoder, max_epoch, device, learning_rate=0.01):
         print('Epoch '+str(epoch)+': perplexity on the train set: '+str(math.exp(loss)))
         with torch.no_grad():
             dev_loss = train_per_epoch(loader.ldDev, encoder, decoder,criterion, optimizer, device, need_grad=False)
-            print('perplexity on the train set: '+str(math.exp(loss)))
+            print('perplexity on the train set: '+str(math.exp(dev_loss)))
 
 def main():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
