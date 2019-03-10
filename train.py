@@ -102,18 +102,19 @@ def evaluate(loader, encoder, decoder):
         input_tensor = inputs['question']
         target_tensor = inputs['response']
         target_length = inputs['rLengths']
-        loss_step, out = train(input_tensor, target_tensor, target_length, encoder, decoder, criterion, optimizer, device, need_grad=need_grad, teacher_forcing_ratio=teacher_forcing_ratio)
-        loss += loss_step
+        maxlen = max(30, target_tensor.shape[1])
+
+        output_e, hidden_e = encoder(input_tensor)
+        output_d, hidden_d = decoder(target_tensor[:,:-1], hidden_e, maxlen, teacher_forcing_ratio = 0)
         
         # batch size for the test data is 1, but we loop through all batches here anyway
-        for i in range(out.shape[0]):
+        for i in range(output_d.shape[0]):
             sentence = []
             for j in range(out.shape[1]):
                 word = torch.topk(out[i,j,:], 1)[1].squeeze(1)
                 sentence.append(word)
             rev_vocab(sentence)
-        n += 1
-    loss /= n
+
     return loss
 
 
