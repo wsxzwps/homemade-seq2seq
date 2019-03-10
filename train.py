@@ -89,7 +89,7 @@ def rev_vocab(idx_seq):
         f.write('\n')
 
 def evaluate(loader, encoder, decoder):
-    ld = iter(loader)[:10]
+    ld = iter(loader)
 
     numIters = len(ld)
     qdar = tqdm.tqdm(range(numIters),
