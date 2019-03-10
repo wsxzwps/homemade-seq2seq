@@ -156,7 +156,7 @@ def main():
     encoder = EncoderRNN(vocab_size, 100, hidden_size, batch_size, embedding).to(device)
     decoder = DecoderRNN(vocab_size, 100, hidden_size, batch_size, embedding).to(device)
 
-    trainIters(loader, encoder, decoder, 100, device, learning_rate=0.01)
+    trainIters(loader, encoder, decoder, 1, device, learning_rate=0.01)
 
 if __name__ == "__main__":
     main()
