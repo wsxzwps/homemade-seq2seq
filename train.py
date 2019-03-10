@@ -74,7 +74,7 @@ def train_per_epoch(loader, encoder, decoder, criterion, optimizer, device, need
     return loss
 
 def rev_vocab(idx_seq):
-    with open(rev_vocab_path),"rb") as fp:
+    with open(rev_vocab_path,"rb") as fp:
         rev_vocab = pickle.load(fp,encoding='latin1')
     
     sentence_out = []
