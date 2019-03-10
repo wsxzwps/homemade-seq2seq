@@ -110,8 +110,8 @@ def evaluate(loader, encoder, decoder):
         # batch size for the test data is 1, but we loop through all batches here anyway
         for i in range(output_d.shape[0]):
             sentence = []
-            for j in range(out.shape[1]):
-                word = torch.topk(out[i,j,:], 1)[1].squeeze(1)
+            for j in range(output_d.shape[1]):
+                word = torch.topk(output_d[i,j,:], 1)[1].squeeze(1)
                 sentence.append(word)
             rev_vocab(sentence)
 
