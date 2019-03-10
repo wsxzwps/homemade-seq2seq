@@ -111,7 +111,7 @@ def evaluate(loader, encoder, decoder):
         for i in range(output_d.shape[0]):
             sentence = []
             for j in range(output_d.shape[1]):
-                word = torch.topk(output_d[i,j,:], 1)[1].squeeze(1)
+                word = torch.topk(output_d[i,j,:], 0)[1]
                 sentence.append(word)
             rev_vocab(sentence)
 
