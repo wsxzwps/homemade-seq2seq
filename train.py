@@ -118,12 +118,12 @@ def evaluate(loader, encoder, decoder):
     return loss
 
 
-def trainIters(loader, encoder, decoder, max_epoch, device, learning_rate=0.01):
+def trainIters(loader, encoder, decoder, max_epoch, device, learning_rate=0.0002):
     start = time.time()
     plot_losses = []
 
     parameters = list(encoder.parameters()) + list(decoder.parameters())
-    optimizer = optim.SGD(parameters, lr=learning_rate)
+    optimizer = optim.Adam(parameters, lr=learning_rate)
     criterion = nn.CrossEntropyLoss()
     best_dev_loss = None
     for epoch in range(max_epoch):

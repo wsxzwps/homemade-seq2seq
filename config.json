@@ -1,7 +1,7 @@
 {
   "expPath": "./exp",
   "loader": {
-    "batchSize": 16,
+    "batchSize": 128,
     "isTrans": 0,
     "wordDict": "./AuxData/wordDict",
     "rev_vocab": "./AuxData/rev_vocab",
