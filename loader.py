@@ -50,10 +50,9 @@ class CustomDataset(Dataset):
 
 		return (question_idx,response_idx)
 
-	def word2index(self, sentence, sos=False):
+	def word2index(self, sentence):
 		indArr = []
-		if sos:
-			indArr.append(self.sos_id)
+		indArr.append(self.sos_id)
 		for i in range(len(sentence)):
 			word = sentence[i]
 			if word in self.wordDict:
@@ -98,13 +97,11 @@ class LoaderHandler(object):
 		print('loader handler...')	
 		mode = config['opt'].mode
 		config = config['loader']
-		if mode == 'test':
-			testData = CustomDataset(config,config['testFile'],forceNoNoise=True)
-			self.ldTestEval = DataLoader(testData,batch_size=1, shuffle=False, collate_fn=seq_collate)
-			return
-		if mode == 'train':
-			trainData = CustomDataset(config,config['trainFile'])
-			self.ldTrain = DataLoader(trainData,batch_size=config['batchSize'], shuffle=True, num_workers=2, collate_fn=seq_collate)
+		testData = CustomDataset(config,config['testFile'],forceNoNoise=True)
+		self.ldTestEval = DataLoader(testData,batch_size=1, shuffle=False, collate_fn=seq_collate)
+
+		trainData = CustomDataset(config,config['trainFile'])
+		self.ldTrain = DataLoader(trainData,batch_size=config['batchSize'], shuffle=True, num_workers=2, collate_fn=seq_collate)
 		# elif mode == 'val':
 		devData = CustomDataset(config,config['devFile'],forceNoNoise=True)
 		self.ldDev = DataLoader(devData,batch_size=config['batchSize'], shuffle=False, num_workers=2, collate_fn=seq_collate)

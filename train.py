@@ -12,34 +12,33 @@ import math
 
 import tqdm
 
-def train(input_tensor, target_tensor, encoder, decoder, criterion, optimizer, device):
-    encoder_hidden = encoder.initHidden(device)
+rev_vocab_path = './AuxData/rev_vocab'
 
-    optimizer.zero_grad()
+def train(input_tensor, target_tensor, target_lengths, encoder, decoder, criterion, optimizer, device, need_grad=True, teacher_forcing_ratio=0):
 
-    input_length = input_tensor.size(1)
-    target_length = target_tensor.size(1)
+    if need_grad:
+        optimizer.zero_grad()
 
     loss = 0
-
+    maxlen = max(30, target_tensor.shape[1])
     # Get encoder hidden states and outputs
-    output_e, hidden_e = encoder(input_tensor, encoder_hidden)
-    
-    # Initialize decoder hidden state
+    output_e, hidden_e = encoder(input_tensor)
 
-    
-    # Get decoder hidden states and outputs
-    output_d, hidden_d = decoder(target_tensor, hidden_e)
+    output_d, hidden_d = decoder(target_tensor[:,:-1], hidden_e, maxlen, teacher_forcing_ratio = teacher_forcing_ratio)
     # Define the loss function
-    loss = criterion(output_e[:,:target_length,:], target_tensor[:,1:])
+    batch_size = output_d.shape[0]
+    for i in range(batch_size):
+        loss += criterion(output_d[i,:target_lengths[i]-1,:], target_tensor[i,1:target_lengths[i]])
     
+    loss /= batch_size
     #####################################
 
-    loss.backward()
+    if need_grad:
+        loss.backward()
 
-    optimizer.step()
+        optimizer.step()
 
-    return loss.item() / target_length
+    return loss.item(), output_d
 
 def asMinutes(s):
     m = math.floor(s / 60)
@@ -54,35 +53,91 @@ def timeSince(since, percent):
     rs = es - s
     return '%s (- %s)' % (asMinutes(s), asMinutes(rs))
 
-def trainIters(loader, encoder, decoder, n_iters, device, print_every=1000, plot_every=100, learning_rate=0.01):
-    start = time.time()
-    plot_losses = []
-    print_loss_total = 0  # Reset every print_every
-    plot_loss_total = 0  # Reset every plot_every
-
-    parameters = list(encoder.parameters()) + list(decoder.parameters())
-    optimizer = optim.SGD(parameters, lr=learning_rate)
-    criterion = nn.NLLLoss()
-
-    ld = iter(loader.ldTrain)
+def train_per_epoch(loader, encoder, decoder, criterion, optimizer, device, need_grad=True, teacher_forcing_ratio=0):
+    ld = iter(loader)
 
     numIters = len(ld)
     qdar = tqdm.tqdm(range(numIters),
                             total= numIters,
                             ascii=True)
+    n = 0
+    loss = 0
     for itr in qdar: 
         inputs = makeInp(next(ld))
         input_tensor = inputs['question']
         target_tensor = inputs['response']
-        loss = train(input_tensor, target_tensor, encoder, decoder, criterion, optimizer, device)
-        print_loss_total += loss
-        plot_loss_total += loss
+        target_length = inputs['rLengths']
+        loss_step, out = train(input_tensor, target_tensor, target_length, encoder, decoder, criterion, optimizer, device, need_grad=need_grad, teacher_forcing_ratio=teacher_forcing_ratio)
+        loss += loss_step
+        n += 1
+    loss /= n
+    return loss
 
-        if iter % print_every == 0:
-            print_loss_avg = print_loss_total / print_every
-            print_loss_total = 0
-            print('%s (%d %d%%) %.4f' % (timeSince(start, iter / n_iters),
-                                         iter, iter / n_iters * 100, print_loss_avg))
+def rev_vocab(idx_seq):
+    with open(rev_vocab_path,"rb") as fp:
+        rev_vocab = pickle.load(fp,encoding='latin1')
+    
+    sentence_out = []
+    for idx in idx_seq:
+        sentence_out.append(rev_vocab[idx])
+        # stop at the first __eou__
+        if idx == 3:
+            break
+    
+    with open('result', 'a') as f:
+        f.write(' '.join(sentence_out))
+        f.write('\n')
+
+def evaluate(loader, encoder, decoder):
+    ld = iter(loader)
+
+    numIters = len(ld)
+    qdar = tqdm.tqdm(range(numIters),
+                            total= numIters,
+                            ascii=True)
+    n = 0
+    loss = 0
+    for itr in qdar: 
+        inputs = makeInp(next(ld))
+        input_tensor = inputs['question']
+        target_tensor = inputs['response']
+        target_length = inputs['rLengths']
+        maxlen = max(30, target_tensor.shape[1])
+
+        output_e, hidden_e = encoder(input_tensor)
+        output_d, hidden_d = decoder(target_tensor[:,:-1], hidden_e, maxlen, teacher_forcing_ratio = 0)
+        
+        # batch size for the test data is 1, but we loop through all batches here anyway
+        for i in range(output_d.shape[0]):
+            sentence = []
+            for j in range(output_d.shape[1]):
+                word = torch.topk(output_d[i,j,:], 1)[1]
+                sentence.append(word.item())
+            rev_vocab(sentence)
+
+    return loss
+
+
+def trainIters(loader, encoder, decoder, max_epoch, device, learning_rate=0.01):
+    start = time.time()
+    plot_losses = []
+
+    parameters = list(encoder.parameters()) + list(decoder.parameters())
+    optimizer = optim.SGD(parameters, lr=learning_rate)
+    criterion = nn.CrossEntropyLoss()
+    best_dev_loss = None
+    for epoch in range(max_epoch):
+        loss = train_per_epoch(loader.ldTrain, encoder, decoder, criterion, optimizer, device, teacher_forcing_ratio=0.5)
+        print('Epoch '+str(epoch)+': perplexity on the train set: '+str(math.exp(loss)))
+        with torch.no_grad():
+            dev_loss = train_per_epoch(loader.ldDev, encoder, decoder,criterion, optimizer, device, need_grad=False)
+            print('perplexity on the dev set: '+str(math.exp(dev_loss)))
+            # # save the best model
+            # if best_dev_loss is None or best_dev_loss > dev_loss:
+            #     best_dev_loss = dev_loss
+            #     torch.save(encoder.state_dict(), PATH)
+    evaluate(loader.ldTestEval, encoder, decoder)
+    
 
 
 def main():
@@ -102,7 +157,7 @@ def main():
     encoder = EncoderRNN(vocab_size, 100, hidden_size, batch_size, embedding).to(device)
     decoder = DecoderRNN(vocab_size, 100, hidden_size, batch_size, embedding).to(device)
 
-    trainIters(loader, encoder, decoder, 10000, device, print_every=1000)
+    trainIters(loader, encoder, decoder, 30, device, learning_rate=0.01)
 
 if __name__ == "__main__":
     main()
